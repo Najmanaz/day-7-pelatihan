@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { email, z } from 'zod';
 import { id } from 'zod/locales';
 
 export const registerUserSchema = z.object({
@@ -14,7 +14,7 @@ export const registerUserSchema = z.object({
         .trim()
         .email('Format email tidak valid')
         .max(255, 'Email terlalu panjang')
-        .transform((value) => value.toLowerCase()),
+        .transform((value) => value.toLowerCase()),        
 
     password: z
         .string()
@@ -22,6 +22,26 @@ export const registerUserSchema = z.object({
         .max(72, 'Password maksimal 72 karakter')
 
 }).strict();
+
+export const updateUserSchema = z.object({
+  body: z.object({
+    name: z
+      .string()
+      .trim()
+      .min(2, 'Nama maksimal 100 karakter')
+      .optional(),
+    email: z
+      .string()
+      .trim()
+      .email('Format email tidak valid')
+      .max(255, 'Email terlalu panjang')
+      .transform(value => value.toLocaleLowerCase())
+      .optional()
+  }).refine(
+    (data) => Object.keys(data).length > 0,
+    { message: 'Minimal harus ada satu data yang diubah' }
+  )
+});
 
 
 export type RegisterUserRequest = z.infer<
